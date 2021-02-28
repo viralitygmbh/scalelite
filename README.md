@@ -98,7 +98,7 @@ See [Deploying Scalelite Docker Containers](docker-README.md)
 
 To switch your Front-End application to use Scalelite instead of a single BigBlueButton server, there are 2 changes that need to be made
 
-- `BigBlueButton server url` should be set to the url of your Scalelite deployment `http(s)://<scalelite-hostname>/bigbluebutton/`
+- `BigBlueButton server url` should be set to the url of your Scalelite deployment `http(s)://<scalelite-hostname>/bigbluebutton/api/`
 - `BigBlueButton shared secret` should be set to the `LOADBALANCER_SECRET` value that you set in `/etc/default/scalelite`
 
 ## Configuration
@@ -110,6 +110,7 @@ To switch your Front-End application to use Scalelite instead of a single BigBlu
 * `URL_HOST`: The hostname that the application API endpoint is accessible from. Used to protect against DNS rebinding attacks. Should be left blank if deploying Scalelite behind a Network Loadbalancer.
 * `SECRET_KEY_BASE`: A secret used internally by Rails. Should be unique per deployment. Generate with `bundle exec rake secret` or `openssl rand -hex 64`.
 * `LOADBALANCER_SECRET`: The shared secret that applications will use when calling BigBlueButton APIs on the load balancer. Generate with `openssl rand -hex 32`
+* `LOADBALANCER_SECRETS`: Additional shared secrets, separated by `:`. Any of these secrets will work. In an environment where multiple applications need to integrate with a single scalelite server, it may be sensible to give each application its own secret. This way, revoking individual secrets later will not disturb other applications. 
 * `DATABASE_URL`: URL for connecting to the PostgreSQL database, see the [Rails documentation](https://guides.rubyonrails.org/configuring.html#configuring-a-database). The URL should be in the form of `postgresql://username:password@connection_url`. Note that instead of using this environment variable, you can configure the database server in `config/database.yml`.
 * `REDIS_URL`: URL for connecting to the Redis server, see the [Redis gem documentation](https://rubydoc.info/github/redis/redis-rb/master/Redis#initialize-instance_method). The URL should be in the form of `redis://username:password@connection_url`. Note that instead of using this environment variable, you can configure the redis server in `config/redis_store.yml` (see below). 
 
@@ -141,7 +142,10 @@ These variables are used by the service startup scripts in the Docker images, bu
 * `RECORDING_UNPUBLISH_DIR`: Directory where unpublished recording files are placed to make them unavailable to the web server. Defaults to `/var/bigbluebutton/unpublished`
 * `SERVER_HEALTHY_THRESHOLD`: The number of times an offline server needs to responds successfully for it to be considered online. Defaults to **1**. If you increase this number, you should decrease `POLL_INTERVAL`
 * `SERVER_UNHEALTHY_THRESHOLD`: The number of times an online server needs to responds unsuccessfully for it to be considered offline. Defaults to **2**. If you increase this number, you should decrease `POLL_INTERVAL`
-* `USE_UUID`: If this is set, Scalelite will generate a UUID for each added server instead of using the hostname.
+* `DB_DISABLED`: Disable the database by setting this value as `true`.
+* `RECORDING_DISABLED`: Disable the recording feature and all its associated api's, by setting this value as `true`.
+* `GET_MEETINGS_API_DISABLED`: Disable GET_MEETINGS API by setting this value as `true`.
+* `POLLER_THREADS`: The number of threads to run in the poller process. The default is 5.
 
 ### Redis Connection (`config/redis_store.yml`)
 
@@ -298,3 +302,7 @@ This will print a table displaying a list of all servers and some basic statisti
 ## Getting Help
 
 For commercial help with setup and deployment of Scalelite, contact us at [Blindside Networks](https://blindsidenetworks.com/scaling-bigbluebutton/).
+
+## Trademarks
+
+This project uses BigBlueButton and is not endorsed or certified by BigBlueButton Inc.  BigBlueButton and the BigBlueButton Logo are trademarks of [BigBlueButton Inc](https://bigbluebutton/org).

@@ -3,7 +3,7 @@
 class BigBlueButtonApiController < ApplicationController
   include ApiHelper
 
-  before_action :verify_checksum, except: :index
+  before_action :verify_checksum, except: [:index, :get_recordings_disabled, :recordings_disabled, :get_meetings_disabled]
 
   def index
     # Return the scalelite build number if passed as an env variable
@@ -129,6 +129,11 @@ class BigBlueButtonApiController < ApplicationController
 
     # Render all meetings if there are any or a custom no meetings response if no meetings exist
     render(xml: meetings_node.children.empty? ? no_meetings_response : all_meetings)
+  end
+
+  def get_meetings_disabled
+    logger.debug('The get meetings api has been disabled')
+    render(xml: no_meetings_response)
   end
 
   def create
@@ -357,6 +362,17 @@ class BigBlueButtonApiController < ApplicationController
     end
 
     render(:delete_recordings)
+  end
+
+  def get_recordings_disabled
+    logger.debug('The recording feature have been disabled')
+    @recordings = []
+    render(:get_recordings)
+  end
+
+  def recordings_disabled
+    logger.debug('The recording feature have been disabled')
+    raise BBBError.new('notFound', 'We could not find recordings')
   end
 
   private
